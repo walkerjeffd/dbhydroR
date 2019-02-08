@@ -263,14 +263,17 @@ parse_hydro_response <- function(res, raw = FALSE){
 
     raw <- suppressMessages(read.csv(text = res, skip = 1, row.names = NULL,
                                      stringsAsFactors = FALSE))
-    i <- min(which(apply(raw[,10:16], 1, function(x) all(is.na(x)))))
+
+    # walkerjeffd: fix column selection to avoid columns with "" instead of NA
+    i <- min(which(apply(raw[,15:16], 1, function(x) all(is.na(x)))))
 
     metadata <- suppressMessages(read.csv(text = res, skip = 1, row.names = NULL,
-                stringsAsFactors = FALSE))[1:(i - 1),]
+                                          stringsAsFactors = FALSE))[1:(i - 1),]
 
     # walkerjeffd: fix mis-aligned columns (row 2 has too many columns, shift names over and drop the last column)
-    names(metadata)[1:17] <- names(metadata)[2:18]
-    metadata <- metadata[, -18]
+    names(metadata)[1:(ncol(metadata) - 1)] <- names(metadata)[2:(ncol(metadata))]
+    metadata <- metadata[, -ncol(metadata)]
+
 
 
     try({dt <- suppressMessages(read.csv(text = res, skip = i + 1,
