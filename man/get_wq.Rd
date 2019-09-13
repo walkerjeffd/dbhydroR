@@ -5,22 +5,22 @@
 \alias{getwq}
 \title{Retrieve water quality data from the DBHYDRO Environmental Database}
 \usage{
-get_wq(station_id = NA, date_min = NA, date_max = NA, test_name = NA,
-  mdl_handling = "raw", raw = FALSE, qc_strip = "N", qc_field = "N",
-  test_number = NA, v_target_code = "file_csv", sample_id = NA,
-  project_code = NA)
+get_wq(station_id = NA, date_min = NA, date_max = NA,
+  test_name = NA, mdl_handling = "raw", raw = FALSE,
+  qc_strip = "N", qc_field = "N", test_number = NA,
+  v_target_code = "file_csv", sample_id = NA, project_code = NA)
 }
 \arguments{
 \item{station_id}{character string of station id(s). See the SFWMD station
-search utility at \url{http://my.sfwmd.gov/dbhydroplsql/water_quality_data.show_group_station_characters}
+search utility at \url{https://my.sfwmd.gov/dbhydroplsql/water_quality_data.show_group_station_characters}
 for specific options}
 
 \item{date_min}{character date must be in POSIXct YYYY-MM-DD format}
 
 \item{date_max}{character date must be in POSIXct YYYY-MM-DD format}
 
-\item{test_name}{character string of test name(s). See the ArcGIS Online
-Station Map at \url{http://my.sfwmd.gov/WAB/EnvironmentalMonitoring/index.html}
+\item{test_name}{character string of test name(s). See the SFWMD
+Station Maps at \url{https://www.sfwmd.gov/documents-by-tag/emmaps}
 for specific options}
 
 \item{mdl_handling}{character string specifying the handling of measurement
@@ -66,12 +66,12 @@ other QA fields.
 }
 \examples{
 
+\dontrun{
 #one variable and one station
 get_wq(station_id = "FLAB08",
 date_min = "2011-03-01", date_max = "2012-05-01",
 test_name = "CHLOROPHYLLA-SALINE")
 
-\dontrun{
 #one variable at multiple stations
 get_wq(station_id = c("FLAB08", "FLAB09"),
 date_min = "2011-03-01", date_max = "2012-05-01",

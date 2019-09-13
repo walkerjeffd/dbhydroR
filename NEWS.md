@@ -1,3 +1,22 @@
+# dbhydroR 0.2-8 
+
+## Minor changes
+
+* Switched all URLs from http to https
+* Turned off automated testing of `get_wq` example code
+
+# dbhydroR 0.2-7 (2019-02-15)
+
+## Bug fixes
+
+* Fixed critical bug in `get_hydro` causing data parsing failure in all cases (#16)
+
+# dbhydroR 0.2-6 (2018-07-19)
+
+## Bug fixes
+
+* Fixed critical bug in `get_hydro` causing data parsing failure in all cases
+
 # dbhydroR 0.2-5 (2018-05-21)
 
 ## Bug fixes

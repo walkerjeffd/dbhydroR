@@ -3,12 +3,12 @@
 #'@description Retrieve water quality data from the
 #' DBHYDRO Environmental Database
 #'@param station_id character string of station id(s). See the SFWMD station
-#' search utility at \url{http://my.sfwmd.gov/dbhydroplsql/water_quality_data.show_group_station_characters}
+#' search utility at \url{https://my.sfwmd.gov/dbhydroplsql/water_quality_data.show_group_station_characters}
 #' for specific options
 #'@param date_min character date must be in POSIXct YYYY-MM-DD format
 #'@param date_max character date must be in POSIXct YYYY-MM-DD format
-#'@param test_name character string of test name(s). See the ArcGIS Online
-#' Station Map at \url{http://my.sfwmd.gov/WAB/EnvironmentalMonitoring/index.html}
+#'@param test_name character string of test name(s). See the SFWMD
+#' Station Maps at \url{https://www.sfwmd.gov/documents-by-tag/emmaps}
 #' for specific options
 #'@param raw logical default is FALSE, set to TRUE to return data in "long"
 #' format with all comments, qa information, and database codes included
@@ -30,7 +30,7 @@
 #'}
 #'@aliases getwq
 #'@export
-#'@importFrom httr GET content
+#'@importFrom httr GET content timeout
 #'@importFrom utils read.csv
 #'@details By default, \code{get_wq} returns a cleaned output. First, the
 #' cleaning function \code{\link{clean_wq}} converts the raw output from native
@@ -43,12 +43,12 @@
 #' other QA fields.
 #'@examples
 #'
+#'\dontrun{
 #'#one variable and one station
 #'get_wq(station_id = "FLAB08",
 #'date_min = "2011-03-01", date_max = "2012-05-01",
 #'test_name = "CHLOROPHYLLA-SALINE")
 #'
-#'\dontrun{
 #'#one variable at multiple stations
 #'get_wq(station_id = c("FLAB08", "FLAB09"),
 #'date_min = "2011-03-01", date_max = "2012-05-01",
@@ -75,7 +75,7 @@ get_wq <- function(station_id = NA, date_min = NA, date_max = NA,
     stop("Enter dates as quote-wrapped character strings in YYYY-MM-DD format")
   }
 
-  servfull <- "http://my.sfwmd.gov/dbhydroplsql/water_quality_data.report_full"
+  servfull <- "https://my.sfwmd.gov/dbhydroplsql/water_quality_data.report_full"
 
   #try(ping<-RCurl::getURL(
   # "http://www.sfwmd.gov/portal/page/portal/sfwmdmain/home%20page"),
@@ -178,7 +178,7 @@ getwq <- function(station_id = NA, date_min = NA, date_max = NA,
 #'\item using the Environmental Monitoring Location Maps
 #' (\url{https://www.sfwmd.gov/documents-by-tag/emmaps})
 #'\item using the DBHYDRO Browser
-#' (\url{http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu}).
+#' (\url{https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu}).
 #'}
 #'
 #'\item The second way to run \code{get_hydro} is to specify additional
@@ -232,7 +232,7 @@ get_hydro <- function(dbkey = NA, date_min = NA, date_max = NA, raw = FALSE,
     dbkey <- substring(dbkey, 1, (nchar(dbkey) - 1))
   }
 
-  servfull <- "http://my.sfwmd.gov/dbhydroplsql/web_io.report_process"
+  servfull <- "https://my.sfwmd.gov/dbhydroplsql/web_io.report_process"
 
   if(!is.na(date_min)){
     date_min <- strftime(date_min, format = "%Y%m%d")
@@ -254,31 +254,26 @@ get_hydro <- function(dbkey = NA, date_min = NA, date_max = NA, raw = FALSE,
   if(raw == FALSE){
     res <- clean_hydro(res)
   }
-
   res
 }
 
 # connect metadata header to results
 parse_hydro_response <- function(res, raw = FALSE){
+    base_skip <- 1
+    raw       <- suppressMessages(read.csv(text = res, skip = base_skip,
+                                           stringsAsFactors = FALSE, row.names = NULL))
+    i         <- 1 + min(which(apply(raw[,10:16], 1, function(x) all(is.na(x) |
+                                                                       nchar(x) == 0))))
 
-    raw <- suppressMessages(read.csv(text = res, skip = 1, row.names = NULL,
-                                     stringsAsFactors = FALSE))
+    # metadata should have type and units columns
+    metadata  <- suppressMessages(read.csv(text = res, skip = base_skip,
+                                    stringsAsFactors = FALSE, row.names = NULL))[1:(i - 1),]
+    names(metadata) <- c(names(metadata)[2:(ncol(metadata))], "AID")
 
-    # walkerjeffd: fix column selection to avoid columns with "" instead of NA
-    i <- min(which(apply(raw[,15:16], 1, function(x) all(is.na(x)))))
-
-    metadata <- suppressMessages(read.csv(text = res, skip = 1, row.names = NULL,
-                                          stringsAsFactors = FALSE))[1:(i - 1),]
-
-    # walkerjeffd: fix mis-aligned columns (row 2 has too many columns, shift names over and drop the last column)
-    names(metadata)[1:(ncol(metadata) - 1)] <- names(metadata)[2:(ncol(metadata))]
-    metadata <- metadata[, -ncol(metadata)]
-
-
-
-    try({dt <- suppressMessages(read.csv(text = res, skip = i + 1,
+    try({dt <- suppressMessages(read.csv(text = res, skip = i,
       stringsAsFactors = FALSE, colClasses = c("DBKEY" = "character")))}
       , silent = TRUE)
+
     if(class(dt) != "data.frame"){
       stop("No data found")
     }
@@ -345,8 +340,8 @@ gethydro <- function(dbkey = NA, date_min = NA, date_max = NA, raw = FALSE,
 #'@aliases getdbkey
 #'@importFrom XML readHTMLTable
 #'@importFrom stats setNames
-#'@references \url{http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu}
-#'@references \url{http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_meta_data}
+#'@references \url{https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu}
+#'@references \url{https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_meta_data}
 #'@examples \dontrun{
 #'# Weather
 #'get_dbkey(stationid = "JBTS", category = "WEATHER", param = "WNDS",
@@ -414,7 +409,7 @@ get_dbkey <- function(category, stationid = NA, param = NA, freq = NA,
     qy <- qy[-which(is.na(qy))]
   }
 
-  servfull <- "http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_dbkeys_matched"
+  servfull <- "https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_dbkeys_matched"
   res <- dbh_GET(servfull, query = qy)
   res <- sub('.*(<table class="grid".*?>.*</table>).*', '\\1',
           suppressMessages(res))
@@ -512,7 +507,7 @@ getdbkey <- function(category, stationid = NA, param = NA, freq = NA,
 }
 
 dbh_GET <- function(url, ...) {
-  res <- httr::GET(url, ...)
+  res <- httr::GET(url, httr::timeout(20), ...)
   httr::stop_for_status(res)
   httr::content(res, "text", encoding = "UTF-8") # parse to text
 }

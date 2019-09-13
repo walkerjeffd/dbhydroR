@@ -6,8 +6,8 @@
 \title{Query dbkey information}
 \usage{
 get_dbkey(category, stationid = NA, param = NA, freq = NA,
-  longest = FALSE, stat = NA, recorder = NA, agency = NA, strata = NA,
-  detail.level = "summary", ...)
+  longest = FALSE, stat = NA, recorder = NA, agency = NA,
+  strata = NA, detail.level = "summary", ...)
 }
 \arguments{
 \item{category}{character string, choice of "WEATHER", "SW", "GW", or "WQ"}
@@ -73,7 +73,7 @@ get_dbkey(stationid = "C111\%", category = "WQ")
 }
 }
 \references{
-\url{http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu}
+\url{https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu}
 
-\url{http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_meta_data}
+\url{https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_meta_data}
 }

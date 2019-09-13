@@ -48,43 +48,40 @@ library(dbhydroR)
 ## Composing database queries
 ### Water quality data
 
-Water quality data can be retrieved using the `get_wq` function which takes four required arguments. The user must specify a station ID, a test name, and a date range. Station IDs can be located on the [ArcGIS Online Station Map](http://my.sfwmd.gov/WAB/EnvironmentalMonitoring/index.html) or the  [Google Earth kmz file](http://my.sfwmd.gov/KMLEXT/CUSTOMKMLS/DBHydro/DBHydroKML/DBHYDRO_KML.kmz). An abbreviated list of available test names can be found in the [appendix](#appendix) to this document while a full listing can be found at the [DBHYDRO metadata page](http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_data_type_info). Dates must be specified in YYYY-MM-DD format (e.g. 2015-02-26).   The following set of examples retrieve measurements between March 2011 and May 2012. They can be run from the R console by issuing the command:
+Water quality data can be retrieved using the `get_wq` function which takes four required arguments. The user must specify a station ID, a test name, and a date range. Station IDs can be located on the [SFWMD Station Maps](https://www.sfwmd.gov/documents-by-tag/emmaps) or the  [Google Earth kmz file](https://my.sfwmd.gov/KMLEXT/CUSTOMKMLS/DBHydro/DBHydroKML/DBHYDRO_KML.kmz). An abbreviated list of available test names can be found in the [appendix](#appendix) to this document while a full listing can be found at the [DBHYDRO metadata page](https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.show_data_type_info). Dates must be specified in YYYY-MM-DD format (e.g. 2015-02-26).   The following set of examples retrieve measurements between March 2011 and May 2012. They can be run from the R console by issuing the command:
 
 ```{r eval = FALSE}
 example(get_wq)
 ```
 
-\begin{itemize}
-\item One variable at one station
+ * One variable at one station
 
 ```{r eval = FALSE}
 get_wq(station_id = "FLAB08", date_min = "2011-03-01", 
       date_max = "2012-05-01", test_name = "CHLOROPHYLLA-SALINE")
 ```
 
-\item One variable at multiple stations
+ * One variable at multiple stations
 
 ```{r eval = FALSE}
 get_wq(station_id = c("FLAB08","FLAB09"), date_min = "2011-03-01",
       date_max = "2012-05-01", test_name = "CHLOROPHYLLA-SALINE")
 ```
 
-\item One variable at a wildcard station
+ * One variable at a wildcard station
 
 ```{r eval = FALSE}
 get_wq(station_id = c("FLAB0%"), date_min = "2011-03-01", 
       date_max = "2012-05-01", test_name = "CHLOROPHYLLA-SALINE")
 ```
 
-\item Multiple variables at multiple stations
+ * Multiple variables at multiple stations
 
 ```{r eval = FALSE}
 get_wq(station_id = c("FLAB08","FLAB09"), date_min = "2011-03-01",
       date_max = "2012-05-01", test_name = c("CHLOROPHYLLA-SALINE",
       "SALINITY"))
 ```
-
-\end{itemize}
 
 \noindent By default, `get_wq` returns a *cleaned output*. First, the cleaning function \verb|clean_wq| converts the raw output from native DBHYDRO *long* format (each piece of data on its own row) to *wide* format (each site x variable combination in its own column) using the reshape2 package [@reshape2]. Next, the extra columns associated with QA flags, LIMS, and District receiving are removed. Finally, row entries associated with QA field *blanks*, which are used to check on potential sources of contamination, are removed.  Setting the `raw` flag to `TRUE` will force \verb|get_wq| to retain information on QA field blanks as well as the other QA fields. An example query that retains this information and the original *long* formatting is shown below.
 
@@ -102,7 +99,7 @@ clean_wq(raw_wq)
 
 ### Hydrologic data
 
-Hydrologic time series data can be retrieved using the `get_hydro` function. The first task to accomplish prior to running `get_hydro` is to identify one or more dbkeys which correspond to unique site x variable time-series. This can be done before-hand using the `get_dbkey` function, the [ArGIS Online Station Map](http://my.sfwmd.gov/WAB/EnvironmentalMonitoring/index.html) or the [DBHYDRO Browser](http://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu). One useful strategy for finding desired dbkeys is to run the `get_dbkey`   function interactively using progressively narrower search terms. For example, suppose we are interested in daily average wind data at Joe Bay but we have no alphanumeric `dbkey`. Initially we could run `get_dbkey` with the `detail.level` set to "summary".
+Hydrologic time series data can be retrieved using the `get_hydro` function. The first task to accomplish prior to running `get_hydro` is to identify one or more dbkeys which correspond to unique site x variable time-series. This can be done before-hand using the `get_dbkey` function, the [SFWMD Station Maps](https://www.sfwmd.gov/documents-by-tag/emmaps) or the [DBHYDRO Browser](https://my.sfwmd.gov/dbhydroplsql/show_dbkey_info.main_menu). One useful strategy for finding desired dbkeys is to run the `get_dbkey`   function interactively using progressively narrower search terms. For example, suppose we are interested in daily average wind data at Joe Bay but we have no alphanumeric `dbkey`. Initially we could run `get_dbkey` with the `detail.level` set to "summary".
 
 ```{r eval = FALSE}
 get_dbkey(stationid = "JBTS", category = "WEATHER", param = "WNDS",
