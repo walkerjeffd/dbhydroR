@@ -17,3 +17,5 @@
 ^docs
 ^doc$
 ^Meta$
+^CRAN-RELEASE$
+^\.github$

@@ -1,9 +1,15 @@
+# dbhydroR 0.2-9
+
+## Minor changes
+
+* Maintenance release to fix testing on CRAN
+
 # dbhydroR 0.2-8 
 
 ## Minor changes
 
 * Switched all URLs from http to https
-* Turned off automated testing of `get_wq` example code
+* Now caching test web requests
 
 # dbhydroR 0.2-7 (2019-02-15)
 
