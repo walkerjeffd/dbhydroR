@@ -509,5 +509,5 @@ getdbkey <- function(category, stationid = NA, param = NA, freq = NA,
 dbh_GET <- function(url, ...) {
   res <- httr::GET(url, httr::timeout(20), ...)
   httr::stop_for_status(res)
-  httr::content(res, "text", encoding = "UTF-8") # parse to text
+  httr::content(res, "text", encoding = "Latin1") # parse to text
 }
