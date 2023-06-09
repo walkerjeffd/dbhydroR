@@ -129,7 +129,7 @@ get_wq <- function(station_id = NA, date_min = NA, date_max = NA,
 
   res <- dbh_GET(servfull, query = qy)
   res <- suppressMessages(read.csv(text = res, stringsAsFactors = FALSE,
-         na.strings = c(" ", "")))
+         na.strings = c(" ", ""), colClasses = c("Station.ID" = "character")))
   res <- res[rowSums(is.na(res)) != ncol(res),]
 
   if(!any(!is.na(res)) | !any(res$Matrix != "DI")){
