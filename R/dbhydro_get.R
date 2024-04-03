@@ -260,6 +260,8 @@ parse_hydro_response <- function(res, raw = FALSE){
     base_skip <- 1
     raw       <- suppressMessages(read.csv(text = res, skip = base_skip,
                                            stringsAsFactors = FALSE, row.names = NULL))
+
+    # first empty row below metadata table
     i         <- min(which(apply(raw[,10:16], 1, function(x) all(is.na(x) |
                                                                        nchar(x) == 0))))
 
@@ -268,10 +270,20 @@ parse_hydro_response <- function(res, raw = FALSE){
                                     stringsAsFactors = FALSE, row.names = NULL))[1:(i - 1),]
     names(metadata) <- c(names(metadata)[2:(ncol(metadata))], "AID")
 
-    j <- which(raw[, 2] == "DBKEY")
-    try({dt <- suppressMessages(read.csv(text = res, skip = base_skip + j,
-      stringsAsFactors = FALSE, colClasses = c("DBKEY" = "character")))}
-      , silent = TRUE)
+    col1 <- trimws(raw[i:nrow(raw), 1])
+    col1[col1 == ""] <- NA_character_
+    j <- (i - 1) + min(which(!is.na(col1)))
+    skip <- base_skip + j
+
+    try({
+      if (raw[base_skip + j, 1] == "Station") {
+        dt <- suppressMessages(read.csv(text = res, skip = skip, header = TRUE, stringsAsFactors = FALSE, colClasses = c("DBKEY" = "character")))
+      } else {
+        dt <- suppressMessages(read.csv(text = res, skip = skip, header = FALSE, stringsAsFactors = FALSE))
+        names(dt) <- c("Station", "DBKEY", "Daily.Date", "Data.Value",
+                       "Qualifier", "Revision.Date")
+      }
+    } , silent = TRUE)
 
     if(class(dt) != "data.frame"){
       stop("No data found")
@@ -281,7 +293,7 @@ parse_hydro_response <- function(res, raw = FALSE){
       message("Column headings missing. Guessing...")
 
       names(dt) <- c("Station", "DBKEY", "Daily.Date", "Data.Value",
-                     "Qualifer", "Revision.Date")
+                     "Qualifier", "Revision.Date")
 
       if(all(is.na(as.POSIXct(strptime(dt$Daily.Date, format = "%d-%b-%Y"))))){
         message("Returning instantaneous data...")
@@ -306,8 +318,7 @@ parse_hydro_response <- function(res, raw = FALSE){
     names(dt) <- tolower(names(dt))
 
     dt
-    }
-#}
+}
 
 #'@export
 gethydro <- function(dbkey = NA, date_min = NA, date_max = NA, raw = FALSE,
