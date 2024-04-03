@@ -260,7 +260,7 @@ parse_hydro_response <- function(res, raw = FALSE){
     base_skip <- 1
     raw       <- suppressMessages(read.csv(text = res, skip = base_skip,
                                            stringsAsFactors = FALSE, row.names = NULL))
-    i         <- 1 + min(which(apply(raw[,10:16], 1, function(x) all(is.na(x) |
+    i         <- min(which(apply(raw[,10:16], 1, function(x) all(is.na(x) |
                                                                        nchar(x) == 0))))
 
     # metadata should have type and units columns
@@ -268,7 +268,8 @@ parse_hydro_response <- function(res, raw = FALSE){
                                     stringsAsFactors = FALSE, row.names = NULL))[1:(i - 1),]
     names(metadata) <- c(names(metadata)[2:(ncol(metadata))], "AID")
 
-    try({dt <- suppressMessages(read.csv(text = res, skip = i,
+    j <- which(raw[, 2] == "DBKEY")
+    try({dt <- suppressMessages(read.csv(text = res, skip = base_skip + j,
       stringsAsFactors = FALSE, colClasses = c("DBKEY" = "character")))}
       , silent = TRUE)
 
